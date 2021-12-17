@@ -12,6 +12,8 @@ Developed by ` vesna.milovanovic@endava.com `
 - Jenkins
 - Git
 
+---
+
 ## Part 1 - Java Web App with Unit Tests 
 
 Source Code: https://github.com/codingvesna/devops-project/tree/java-web-app
@@ -42,6 +44,11 @@ A Simple Web App built with Java & Maven.
 
 ---
 
+## Part 2 - Infrastructure
+
+---
+
 ### Other
 
 - EC2 Ubuntu Instance ` controller ` that is as a control node for Terraform and Ansible.
+
