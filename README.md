@@ -1,8 +1,8 @@
 # devops-project
 
-** Developed by vesna.milovanovic@endava.com **
+Developed by ` vesna.milovanovic@endava.com `
 
-** Tech Stack **
+**Tech Stack**
 - Java
 - Maven
 - AWS
@@ -39,3 +39,9 @@ A Simple Web App built with Java & Maven.
 - Apache Maven 3.8.4
 - AWS Elastic Beanstalk (deployment)
 - IntelliJ IDEA - IDE for app development
+
+---
+
+### Other
+
+- EC2 Ubuntu Instance ` controller ` that is as a control node for Terraform and Ansible.
