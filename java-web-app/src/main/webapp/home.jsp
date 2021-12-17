@@ -27,7 +27,7 @@ To change this template use File | Settings | File Templates.
     <!--    Login Section -->
     <div class="w-full md:w-1/2 flex flex-col">
         <div class="flex justify-center md:justify-start pt-12 md:pl-12 md:-mb-24">
-            <a href="index.jsp" class="bg-red-700 text-white font-bold text-xl p-4" id="home">Go Back</a>
+            <a href="index.jsp" class="bg-red-700 text-white font-bold text-xl p-4" id="login">Go Back</a>
         </div>
 
         <div class="flex flex-col justify-center md:justify-start my-auto pt-8 md:pt-0 px-8 md:px-24 lg:px-32">
