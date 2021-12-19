@@ -24,14 +24,14 @@ pipeline {
 
         stage('test') {
             steps {
-                sh 'mvn test -Dskiptests'
+                sh 'mvn test -DskipTests'
             }
         }
 
         stage('package') {
             steps {
                 script {
-                  sh 'mvn package -Dskiptests'
+                  sh 'mvn package -DskipTests'
                 }
                 archiveArtifacts artifacts: 'target/*.war', followSymlinks: false
             }
