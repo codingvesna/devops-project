@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
-    bucket = "devops-project-v1"
+    bucket = "s3devopsproject"
     key    = "terraform/state"
-    region = "eu-central-1"
+    region = "eu-west-1"
   }
 }
