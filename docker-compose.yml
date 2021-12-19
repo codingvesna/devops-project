@@ -1,12 +1,12 @@
 version: "3.9"
 services:
   app:
-    image: vesnam/java-web-app
-    container_name: java-web-app-freestyle
+    image: vesnam/java-multi-stage
+    container_name: java-multi-stage
     ports:
       - '8081:8080'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - logvolume01:/var/log
+      - logvolume02:/var/log
 volumes:
-  logvolume01: {}
+  logvolume02: {}
