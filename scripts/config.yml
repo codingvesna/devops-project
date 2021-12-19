@@ -1,0 +1,122 @@
+---
+-
+  name: install java
+  hosts: all
+  remote_user: ubuntu
+  gather_facts: false
+  become: true
+  tasks:
+    - name: update
+      apt:
+        update_cache: yes
+
+    - name: install jre
+      apt:
+        name: default-jre
+        state: present
+        install_recommends: yes
+
+    - name: install jdk
+      apt:
+        name: openjdk-11-jdk
+        state: present
+        install-recommends: no
+
+    - name: verify installation
+      command: "java --version"
+      register: javaversion
+
+    - name: print var
+      debug:
+        var: javaversion.stdout_lines
+
+-
+  name: install maven
+  hosts: all
+  remote_user: ubuntu
+  gather_facts: false
+  become: true
+  tasks:
+    - name: update
+      apt:
+        update_cache: yes
+
+    - name: download apache maven
+      apt:
+        name: maven
+        state: latest
+
+    - name: verify installation
+      command: "mvn -v"
+      register: mvnversion
+
+    - name: print var
+      debug:
+       var: mvnversion.stdout_lines
+
+-
+  name: install jenkins
+  hosts: all
+  remote_user: ubuntu
+  gather_facts: false
+  become: true
+  tasks:
+    - name: get Jenkins deb packages
+      shell: "curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee \ /usr/share/keyrings/jenkins-keyring.asc > /dev/null"
+
+    - name: add a Jenkins apt repo entry
+      shell: "echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \ /etc/apt/sources.list.d/jenkins.list > /dev/null"
+
+    - name: install jenkins
+      apt:
+        name: jenkins
+        state: latest
+        update_cache: yes
+
+    - name: register the jenkins service
+      ansible.builtin.systemd:
+        daemon_reload: yes
+
+    - name: start the jenkins service
+      ansible.builtin.systemd:
+        name: jenkins
+        state: started
+
+    - name: install firewalld
+      apt:
+        name: firewalld
+        state: present
+        install_recommends: no
+
+    - name: enable firewald
+      ansible.builtin.systemd:
+        name: firewalld
+        enabled: true
+
+    - name: start firewalld
+      ansible.builtin.systemd:
+        name: firewalld
+        state: started
+
+    - name: ensure jenkins service added to firewalld
+      firewalld:
+        service: jenkins
+        state: enabled
+        permanent: yes
+        immediate: yes
+
+    - name: ensure port 8080 added to firewalld
+      firewalld:
+        port: 8080/tcp
+        state: enabled
+        permanent: yes
+        immediate: yes
+
+    - name: get init password
+      shell: "cat /var/lib/jenkins/secrets/initialAdminPassword"
+      changed_when: false
+      register: jenkinspass
+
+    - name: print jenkins password
+      debug:
+        var: jenkinspass.stdout_lines
