@@ -1,6 +1,6 @@
 pipeline {
     environment {
-        registry = "341495406858.dkr.ecr.eu-west-1.amazonaws.com/java-ecs"
+        registry = "http://341495406858.dkr.ecr.eu-west-1.amazonaws.com/java-ecs"
         myImage = ''
      
     }
