@@ -135,7 +135,7 @@ volumes:
 
 ### Freestyle Job  
 
-- Checkout from SCM `https://github.com/codingvesna/devops-project.git` branch: `java-web-app'
+- Checkout from SCM `https://github.com/codingvesna/devops-project.git` branch: `java-web-app`
 - Build Project with Maven -> package `java-web-app.war` in `target` folder
 - Credentials and repo name for publishing a Docker Image on DockerHub
 - Use **Docker Build and Publish Plugin** - define repo name on DockerHub
@@ -146,10 +146,141 @@ volumes:
 
 - After building image, the image is automatically pulled from DockerHub and the container is started.
 
-To see the web app type in your browser: http://public_ip_address:8081/java-web-app/
+- To see the web app type in your browser:` http://public_ip_address:8081/java-web-app/ `
+
 ---
 
 ## Demo 2 - Jenkins Pipeline - Build & Deploy Docker Image
+
+Source Code: https://github.com/codingvesna/devops-project/tree/pipeline
+
+Docker Image: https://hub.docker.com/repository/docker/vesnam/java-pipeline
+
+## Jenkinsfile
+
+**declarative pipeline** next step: scripted pipeline
+
+```
+pipeline {
+    environment {
+        registry = "vesnam/java-pipeline"
+        registryCredential = 'dockerhub'
+        dockerImage = ''
+        container = 'java-pipeline'
+    }
+    agent any
+    tools {
+        maven 'M3'
+    }
+    stages {
+        stage('code') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/pipeline']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/codingvesna/devops-project.git']]])
+            }
+        }
+
+        stage('build') {
+            steps {
+                sh 'mvn clean compile'
+            }
+        }
+
+        stage('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
+        stage('package') {
+            steps {
+                script {
+                  sh 'mvn package'
+                }
+                archiveArtifacts artifacts: 'target/*.war', followSymlinks: false
+            }
+        }
+
+        stage('build docker image'){
+            steps  {
+                script {
+                //     sh 'docker build -t vesnam/pipeline .'
+                    dockerImage = docker.build registry
+                }
+
+            }
+
+        }
+        stage('deploy image') {
+            steps{
+                script {
+                    docker.withRegistry( 'https://registry.hub.docker.com/', registryCredential ) {
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
+
+        stage('run container') {
+            steps {
+                sh 'docker-compose up -d --build'
+            }
+        }
+
+        stage('cleanup') {
+            steps{
+//                 sh 'docker stop $container'
+//                 sh 'docker rm $container'
+                sh 'docker rmi $registry'
+            }
+        }
+
+
+    }
+}
+```
+
+In this case, the pipeline is defined in `Jenkinsfile` and pulled from a GitHub repo.
+
+ - Create credentials for DockerHub - dockerhub
+ - Define variables for Docker setup
+ - CI/CD Pipeline : 
+    - `code` -> pull code from a `github` repo
+	- `build` -> clean workspace and compile (no compile in this case)
+	- `test` -> unit testin
+	- `package` -> build`.war` file and archive
+	- `build docker image` -> build image from file
+	- `deploy image` -> image deployed to DockerHub
+	- `run container` -> run container from deployed image 
+	- `cleanup` -> remove unused image
+	
+
+## Dockerfile
+```
+FROM tomcat:9
+EXPOSE 8080
+ADD target/*.war /usr/local/tomcat/webapps
+```
+
+## docker-compose.yml
+```
+version: "3.9"
+services:
+   app:
+      image: vesnam/java-pipeline
+      container_name: ${container}
+      ports:
+         - '8081:8080'
+      volumes:
+         - /var/run/docker.sock:/var/run/docker.sock
+         - logvolume03:/var/log
+volumes:
+   logvolume03: {}
+```
+### Final Result
+
+- Check response `curl http://localhost:8081/java-web-app/`
+
+- To see the web app type in your browser:` http://public_ip_address:8081/java-web-app/ `
 
 ---
 
