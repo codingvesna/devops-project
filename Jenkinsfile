@@ -1,9 +1,9 @@
 pipeline {
     environment {
-        registry = "vesnam/java-pipeline"
+        registry = "vesnam/java-ecs"
         registryCredential = 'dockerhub'
         dockerImage = ''
-        container = 'java-pipeline'
+        container = 'java-ecs'
     }
     agent any
     tools {
@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('code') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/pipeline']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/codingvesna/devops-project.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/ecs-demo']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/codingvesna/devops-project.git']]])
             }
         }
 
