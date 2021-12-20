@@ -95,12 +95,70 @@ What's defined in `config.yml`?
 - JDK, JRE
 - Maven
 - Jenkins
-- Firewalld
+- Firewall
+
+### Jenkins Configuration
+
+- Maven & JDK setup - add env vars
+- Install Plugins - 
+
+---
+
+## Demo 1 - Jenkins Freestyle Job - Build & Deploy Docker Image
+
+Source Code: https://github.com/codingvesna/devops-project/tree/freestyle-job
+
+Docker Image: https://hub.docker.com/repository/docker/vesnam/java-web-app
+
+### Dockerfile
+```
+FROM tomcat:9
+EXPOSE 8080
+ADD target/*.war /usr/local/tomcat/webapps
+```
+
+### docker-compose.yml
+```
+version: "3.9"
+services:
+  app:
+    image: vesnam/java-web-app
+    container_name: java-web-app-freestyle
+    ports:
+      - '8081:8080'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - logvolume01:/var/log
+volumes:
+  logvolume01: {}
+```
+
+### Freestyle Job  
+
+- Checkout from SCM `https://github.com/codingvesna/devops-project.git` branch: `java-web-app'
+- Build Project with Maven -> package `java-web-app.war` in `target` folder
+- Credentials and repo name for publishing a Docker Image on DockerHub
+- Use **Docker Build and Publish Plugin** - define repo name on DockerHub
+- Add **docker compose build step** in Jenkins, start service / container 
+- Post-build: archive the artifacts	
+
+### Final Result
+
+- After building image, the image is automatically pulled from DockerHub and the container is started.
+
+To see the web app type in your browser: http://public_ip_address:8081/java-web-app/
+---
+
+## Demo 2 - Jenkins Pipeline - Build & Deploy Docker Image
+
+---
+
+## Demo 3 - Multi Stage Dockerfile - Jenkins Build & Deploy Docker Image
 
 ---
 
 ### Other
 
 - EC2 Ubuntu Instance ` terraform-controller ` that is as a control node for Terraform and Ansible.
-- Bash scripts `install-ansible.yml` , `install-terraform.sh`, `update.sh` - to install Terraform and Ansible on control node
+- Bash scripts `install-ansible.sh` , `install-terraform.sh`, `update.sh` - to install Terraform and Ansible on control node
 
