@@ -1,11 +1,12 @@
 pipeline {
     environment {
 		dockerImage = ""
-	    aws_account_id = "341495406858"
+	        aws_account_id = "341495406858"
 		aws_default_region = "eu-west-1"
 		image_repo_name = "java-ecs"
 		image_tag = "latest"
         registry = "${aws_account_id}.dkr.ecr.${aws_default_region}.amazonaws.com/${image_repo_name}" 
+	    
     }
     agent any
     tools {
@@ -15,6 +16,7 @@ pipeline {
 	
 		stage('aws login'){
 			steps {
+				alias aws='docker run --rm -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY amazon/aws-cli'
 				sh "aws ecr get-login-password --region ${aws_default_region} | docker login --username AWS --password-stdin ${aws_account_id}.dkr.ecr.${aws_default_region}"
 			}
 		}
