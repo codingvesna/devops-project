@@ -1,6 +1,6 @@
 # devops-project
 
-Developed by ` vesna.milovanovic@endava.com `
+
 
 **Tech Stack**
 - Java
