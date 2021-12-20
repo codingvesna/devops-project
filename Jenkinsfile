@@ -1,9 +1,9 @@
 pipeline {
     environment {
-        registry = "vesnam/java-ecs"
-        registryCredential = 'dockerhub'
-        dockerImage = ''
-        container = 'java-ecs'
+        registry = ""
+        registryCredential = ''
+        myImage = ''
+     
     }
     agent any
     tools {
@@ -36,41 +36,23 @@ pipeline {
                 archiveArtifacts artifacts: 'target/*.war', followSymlinks: false
             }
         }
-
-        stage('build docker image'){
-            steps  {
+  
+        stage('deploy') {
+              steps {
                 script {
-                //     sh 'docker build -t vesnam/webapp-pipeline .'
-                    dockerImage = docker.build registry
-                }
+                  docker.withRegistry(
+                    'https://341495406858.dkr.ecr.eu-west-1.amazonaws.com',
+                    'ecr:eu-west-1:aws_credentials'
+                    ) {
+                      myImage = docker.build('java-ecs')
+                      myImage.push()
+                     }
+                 }
+              }
+       }
 
-            }
-
-        }
-        stage('deploy image') {
-            steps{
-                script {
-                    docker.withRegistry( 'https://registry.hub.docker.com/', registryCredential ) {
-                        dockerImage.push()
-                    }
-                }
-            }
-        }
-
-        stage('run container') {
-            steps {
-                sh 'docker-compose up -d --build'
-            }
-        }
-
-        stage('cleanup') {
-            steps{
-//                 sh 'docker stop $container'
-//                 sh 'docker rm $container'
-                sh 'docker rmi $registry'
-            }
-        }
-
+        
+        
 
     }
 }
