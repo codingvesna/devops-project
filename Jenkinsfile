@@ -60,8 +60,9 @@ pipeline {
                 script {
                   sh "docker tag ${image_repo_name}:${image_tag} ${registry}:$image_tag"
                   sh "docker push ${aws }.dkr.ecr.${aws_default_region}.amazonaws.com/${image_repo_name}:${image_tag}"
-              }
-       }
+                }
+             }
+	}
 
         
         
