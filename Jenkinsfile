@@ -41,7 +41,7 @@ pipeline {
               steps {
                 script {
                   docker.withRegistry(
-                    'https://341495406858.dkr.ecr.eu-west-1.amazonaws.com',
+                    '341495406858.dkr.ecr.eu-west-1.amazonaws.com/java-ecs',
                     'ecr:eu-west-1:aws_credentials'
                     ) {
                       myImage = docker.build('java-ecs')
