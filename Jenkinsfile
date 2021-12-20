@@ -1,15 +1,26 @@
 pipeline {
     environment {
-        registry = "http://341495406858.dkr.ecr.eu-west-1.amazonaws.com/java-ecs"
-        myImage = ''
-     
+		dockerImage = ""
+	    aws_account_id = "341495406858"
+		aws_default_region = "eu-west-1"
+		image_repo_name = "java-ecs"
+		image_tag = "latest"
+        registry = "${aws_account_id}.dkr.ecr.${aws_default_region}.amazonaws.com/${image_repo_name}" 
     }
     agent any
     tools {
         maven 'M3'
     }
     stages {
-        stage('code') {
+	
+		stage('aws login'){
+			steps {
+				sh "aws ecr get-login-password --region ${aws_default_region} |
+				docker login --username AWS --password-stdin ${aws_account_id}.dkr.ecr.${aws_default_region}"
+			}
+		}
+ 
+		stage('code') {
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: '*/ecs-demo']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/codingvesna/devops-project.git']]])
             }
@@ -36,25 +47,20 @@ pipeline {
             }
         }
         
-            // Building Docker images
+            // Building Docker image
         stage('Building image') {
           steps{
             script {
-              myImage = docker.build registry
+              dockerImage = docker.build "${image_repo_name}:${image_tag}"
             }
           }
         }
   
-        stage('deploy') {
+        stage('push to AWS ECR') {
               steps {
                 script {
-                  docker.withRegistry(
-                    '341495406858.dkr.ecr.eu-west-1.amazonaws.com',
-                    'ecr:eu-west-1:aws_credentials'
-                    ) {
-                      myImage.push()
-                     }
-                 }
+                  sh "docker tag ${image_repo_name}:${image_tag} ${registry}:$image_tag"
+                  sh "docker push ${aws }.dkr.ecr.${aws_default_region}.amazonaws.com/${image_repo_name}:${image_tag}"
               }
        }
 
