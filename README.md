@@ -286,6 +286,59 @@ volumes:
 
 ## Demo 3 - Multi Stage Dockerfile - Jenkins Build & Deploy Docker Image
 
+
+Source Code: https://github.com/codingvesna/devops-project/tree/multi-stage
+
+Docker Image: https://hub.docker.com/repository/docker/vesnam/java-multi-stage
+
+## Dockerfile
+```
+FROM maven:3.8.4-jdk-11 AS build
+WORKDIR /app
+COPY src src
+COPY pom.xml .
+RUN mvn package
+
+FROM tomcat:9
+# copying from stage
+COPY --from=build /app/target/*.war /usr/local/tomcat/webapps
+EXPOSE 8080
+
+# copying from local directory
+# COPY target/*.war /usr/local/tomcat/webapps
+```
+
+**EXPLAINED**
+
+This is a `two-stage` build as there are two `FROM` statements.
+
+The `build` (maven) stage is the base stage for the first build. This is used to build the `war` file for the app.
+
+The `tomcat` stage is the second and final base image for the build. The `war` file generated in the `build` stage is copied over to this stage using
+`COPY --from=build` syntax.
+
+## docker-compose.yml
+```
+version: "3.9"
+services:
+  app:
+    image: vesnam/java-multi-stage
+    container_name: java-multi-stage
+    ports:
+      - '8081:8080'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - logvolume02:/var/log
+volumes:
+  logvolume02: {}
+```
+
+## Final Result
+- Check response `curl http://localhost:8081/java-web-app/`
+
+- To see the web app type in your browser:` http://public_ip_address:8081/java-web-app/ `
+
+
 ---
 
 ### Other
