@@ -1,12 +1,12 @@
 version: "3.9"
 services:
    app:
-      image: vesnam/java-pipeline
+      image: vesnam/java-ecs
       container_name: ${container}
       ports:
          - '8081:8080'
       volumes:
          - /var/run/docker.sock:/var/run/docker.sock
-         - logvolume03:/var/log
+         - logvolume04:/var/log
 volumes:
-   logvolume03: {}
+   logvolume04: {}
