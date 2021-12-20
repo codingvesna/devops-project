@@ -1,7 +1,6 @@
 pipeline {
     environment {
-        registry = ""
-        registryCredential = ''
+        registry = "341495406858.dkr.ecr.eu-west-1.amazonaws.com/java-ecs"
         myImage = ''
      
     }
@@ -36,6 +35,15 @@ pipeline {
                 archiveArtifacts artifacts: 'target/*.war', followSymlinks: false
             }
         }
+        
+            // Building Docker images
+        stage('Building image') {
+          steps{
+            script {
+              myImage = docker.build registry
+            }
+          }
+        }
   
         stage('deploy') {
               steps {
@@ -44,7 +52,6 @@ pipeline {
                     '341495406858.dkr.ecr.eu-west-1.amazonaws.com',
                     'ecr:eu-west-1:aws_credentials'
                     ) {
-                      myImage = docker.build('java-ecs')
                       myImage.push()
                      }
                  }
